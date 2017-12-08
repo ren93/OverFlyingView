@@ -65,6 +65,11 @@ public class ContractGridView extends ViewGroup {
         }
 
         @Override
+        public int getViewVerticalDragRange(View child) {
+            return getMeasuredHeight() - child.getMeasuredHeight();
+        }
+
+        @Override
         public int clampViewPositionVertical(View child, int top, int dy) {
             final int topBound = getPaddingTop();
             final int bottomBound = getHeight() - child.getHeight() - topBound - elevationHeight;
@@ -108,11 +113,14 @@ public class ContractGridView extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_MOVE)
+            return true;
         return mDragger.shouldInterceptTouchEvent(event);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.d("qqqq", "onTouchEvent");
         mDragger.processTouchEvent(event);
         return true;
     }

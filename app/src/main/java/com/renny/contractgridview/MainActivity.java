@@ -12,7 +12,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
     }
 
 
@@ -24,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     public void showBottomDialog(View view) {
 
         FragmentManager fm = getSupportFragmentManager();
-        BottomDialogFragment editNameDialog = new BottomDialogFragment();
+        BottomDialog editNameDialog = new BottomDialog();
         editNameDialog.show(fm, "fragment_bottom_dialog");
     }
 }
