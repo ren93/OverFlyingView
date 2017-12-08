@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/colorPrimary">
+    android:layout_height="wrap_content">
 
-    <TextView
+    <com.renny.contractgridview.ContractGridView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="Hello World!"
-        />
-</android.support.constraint.ConstraintLayout>
+        android:layout_margin="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@drawable/background"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="@drawable/background"/>
+    </com.renny.contractgridview.ContractGridView>
+</FrameLayout>

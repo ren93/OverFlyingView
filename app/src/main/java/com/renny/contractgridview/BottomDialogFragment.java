@@ -1,6 +1,8 @@
 package com.renny.contractgridview;
 
 import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -26,10 +28,13 @@ public class BottomDialogFragment extends DialogFragment {
         dialog.setCanceledOnTouchOutside(true); // 外部点击取消
         Window window = dialog.getWindow();
         if (window != null) {
+            window.setWindowAnimations(R.style.animate_dialog);
             WindowManager.LayoutParams lp = window.getAttributes();
             lp.gravity = Gravity.BOTTOM; //底部
             lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             window.setAttributes(lp);
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));//透明背景
         }
         return dialog;
     }
