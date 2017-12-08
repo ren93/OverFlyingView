@@ -44,7 +44,6 @@ public class ContractGridView extends ViewGroup {
         if (mDragger == null) {
             topView = getChildAt(0);
             bottomView = getChildAt(1);
-            Log.d("xxxx", "onFinishInflate");
             bringChildToFront(topView);
             mDragger = ViewDragHelper.create(this, 1.0f, new ViewDragHelperCallBack());
         }
@@ -59,14 +58,12 @@ public class ContractGridView extends ViewGroup {
 
         @Override
         public int clampViewPositionHorizontal(View child, int left, int dx) {
-            final int leftBound = getPaddingLeft();
-            final int rightBound = getWidth() - child.getWidth() - leftBound;
-            return Math.min(Math.max(left, leftBound), rightBound);
+            return 0;
         }
 
         @Override
         public int getViewVerticalDragRange(View child) {
-            return getMeasuredHeight() - child.getMeasuredHeight();
+            return 1;
         }
 
         @Override
@@ -113,8 +110,6 @@ public class ContractGridView extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_MOVE)
-            return true;
         return mDragger.shouldInterceptTouchEvent(event);
     }
 
@@ -130,7 +125,7 @@ public class ContractGridView extends ViewGroup {
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.d("xxxx", "onMeasure");
+
         /**
          * 获得此ViewGroup上级容器为其推荐的宽和高，以及计算模式
          */
@@ -141,9 +136,7 @@ public class ContractGridView extends ViewGroup {
 
         // 计算出所有的childView的宽和高
         measureChildren(widthMeasureSpec, heightMeasureSpec);
-        /**
-         * 记录如果是wrap_content是设置的宽和高
-         */
+
         int width = 0;
         int height = 0;
 
@@ -170,7 +163,6 @@ public class ContractGridView extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        Log.d("xxxx", "onLayout");
         /**
          * 遍历所有childView根据其宽和高，以及margin进行布局
          */
@@ -185,7 +177,6 @@ public class ContractGridView extends ViewGroup {
                     cl = cParams.leftMargin;
                     ct = getHeight() - cHeight - cParams.bottomMargin - extendHeight;
                     cb = cHeight + ct + extendHeight;
-                    Log.d("bbbb", ct + " " + getHeight());
                     childView.setPadding(0, extendHeight, 0, 0);
                     cr = cl + cWidth;
                     break;

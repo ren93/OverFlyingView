@@ -19,7 +19,7 @@ import static android.widget.Toast.LENGTH_SHORT;
  * Created by Renny on 2017/12/8.
  */
 
-public class BottomDialog extends DialogFragment implements View.OnClickListener {
+public class BottomDialogFragment extends DialogFragment implements View.OnClickListener {
 
 
     @Override
@@ -29,10 +29,16 @@ public class BottomDialog extends DialogFragment implements View.OnClickListener
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        View topView = view.findViewById(R.id.top_view);
-        View bottomView = view.findViewById(R.id.bottom_view);
-        topView.setOnClickListener(this);
-        bottomView.setOnClickListener(this);
+        view.findViewById(R.id.sogo1).setOnClickListener(this);
+        view.findViewById(R.id.sogo2).setOnClickListener(this);
+        view.findViewById(R.id.sogo3).setOnClickListener(this);
+        view.findViewById(R.id.qq1).setOnClickListener(this);
+        view.findViewById(R.id.qq2).setOnClickListener(this);
+        view.findViewById(R.id.qq3).setOnClickListener(this);
+        view.findViewById(R.id.ie1).setOnClickListener(this);
+        view.findViewById(R.id.ie2).setOnClickListener(this);
+        view.findViewById(R.id.ie3).setOnClickListener(this);
+
     }
 
     public void onStart() {
@@ -50,14 +56,23 @@ public class BottomDialog extends DialogFragment implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
+        v.setSelected(!v.isSelected());
         int id = v.getId();
         switch (id) {
-            case R.id.top_view:
-                Toast.makeText(getActivity(), "top", LENGTH_SHORT).show();
+            case R.id.sogo1:
+            case R.id.sogo2:
+            case R.id.sogo3:
+                Toast.makeText(getActivity(), "SoGO", LENGTH_SHORT).show();
                 break;
-            case R.id.bottom_view:
-                Toast.makeText(getActivity(), "bottom", LENGTH_SHORT).show();
-                v.setSelected(!v.isSelected());
+            case R.id.qq1:
+            case R.id.qq2:
+            case R.id.qq3:
+                Toast.makeText(getActivity(), "QQ", LENGTH_SHORT).show();
+                break;
+            case R.id.ie1:
+            case R.id.ie2:
+            case R.id.ie3:
+                Toast.makeText(getActivity(), "IE", LENGTH_SHORT).show();
                 break;
         }
     }

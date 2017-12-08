@@ -23,26 +23,28 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/top_view"
+                    android:id="@+id/sogo1"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:scaleType="center"
-                    android:src="@drawable/sogo"/>
+                    android:src="@drawable/bg_sogo"/>
 
                 <ImageView
+                    android:id="@+id/sogo2"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:scaleType="center"
-                    android:src="@drawable/sogo"/>
+                    android:src="@drawable/bg_sogo"/>
 
                 <ImageView
+                    android:id="@+id/sogo3"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:scaleType="center"
-                    android:src="@drawable/sogo"/>
+                    android:src="@drawable/bg_sogo"/>
 
             </LinearLayout>
 
@@ -52,27 +54,29 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-
                 <ImageView
+                    android:id="@+id/qq1"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:scaleType="center"
-                    android:src="@drawable/qq"/>
+                    android:src="@drawable/bg_qq"/>
 
                 <ImageView
+                    android:id="@+id/qq2"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:scaleType="center"
-                    android:src="@drawable/qq"/>
+                    android:src="@drawable/bg_qq"/>
 
                 <ImageView
+                    android:id="@+id/qq3"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:scaleType="center"
-                    android:src="@drawable/qq"/>
+                    android:src="@drawable/bg_qq"/>
             </LinearLayout>
         </LinearLayout>
 
@@ -83,26 +87,28 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/bottom_view"
+                android:id="@+id/ie1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:scaleType="center"
-                android:src="@drawable/bg_ic"/>
+                android:src="@drawable/bg_ie"/>
 
             <ImageView
+                android:id="@+id/ie2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:scaleType="center"
-                android:src="@drawable/bg_ic"/>
+                android:src="@drawable/bg_ie"/>
 
             <ImageView
+                android:id="@+id/ie3"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:scaleType="center"
-                android:src="@drawable/bg_ic"/>
+                android:src="@drawable/bg_ie"/>
         </LinearLayout>
     </com.renny.contractgridview.ContractGridView>
 </FrameLayout>
