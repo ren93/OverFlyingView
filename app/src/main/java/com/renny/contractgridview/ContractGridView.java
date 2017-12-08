@@ -22,6 +22,7 @@ public class ContractGridView extends ViewGroup {
     private openChangeListener mOpenChangeListener;
     private int elevationHeight = 25;//层叠高度
     private int extendHeight = 30;//延伸高度
+    private boolean isExpand = true;
 
     public ContractGridView(@NonNull Context context) {
         this(context, null);
@@ -49,6 +50,26 @@ public class ContractGridView extends ViewGroup {
         }
     }
 
+    //折叠布局
+    public void foldLayout() {
+        if (topView != null && mDragger != null) {
+            isExpand = false;
+            mDragger.settleCapturedViewAt(topView.getLeft(), getHeight() - topView.getHeight() - elevationHeight);
+        }
+    }
+
+    //还原/展开布局
+    public void expandLayout() {
+        if (topView != null && mDragger != null) {
+            mDragger.settleCapturedViewAt(topView.getLeft(), 0);
+            isExpand = true;
+        }
+    }
+
+    //布局是否展开状态
+    public boolean isExpand() {
+        return isExpand;
+    }
 
     private class ViewDragHelperCallBack extends ViewDragHelper.Callback {
         @Override
@@ -75,7 +96,8 @@ public class ContractGridView extends ViewGroup {
 
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
-            float percent = (float) top / (getHeight() - changedView.getHeight());
+            float percent = (float) top / (getHeight() - changedView.getHeight() - elevationHeight);
+            Log.d("xxxx", "percent" + percent);
             if (mOpenChangeListener != null) {
                 mOpenChangeListener.onScrolling(percent);
             }
@@ -91,6 +113,7 @@ public class ContractGridView extends ViewGroup {
                 float movePercentage = (float) (releasedChild.getTop()) / (getHeight() - releasedChild.getHeight() - elevationHeight);
                 int finalTop = (movePercentage >= .5f) ? getHeight() - releasedChild.getHeight() - elevationHeight : 0;
                 mDragger.settleCapturedViewAt(releasedChild.getLeft(), finalTop);
+                isExpand = movePercentage < .5f;
                 invalidate();
             }
         }
@@ -115,7 +138,6 @@ public class ContractGridView extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        Log.d("qqqq", "onTouchEvent");
         mDragger.processTouchEvent(event);
         return true;
     }
@@ -193,6 +215,7 @@ public class ContractGridView extends ViewGroup {
 
     public void setExtendHeight(int extendHeight) {
         this.extendHeight = extendHeight;
+        requestLayout();
     }
 
     public void setOpenChangeListener(openChangeListener openChangeListener) {
@@ -201,6 +224,7 @@ public class ContractGridView extends ViewGroup {
 
     public void setElevationHeight(int elevationHeight) {
         this.elevationHeight = elevationHeight;
+        requestLayout();
     }
 
     public interface openChangeListener {
