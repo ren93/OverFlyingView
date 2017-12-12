@@ -28,6 +28,8 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     private int totalWidth = 0;
     private int verticalScrollOffset;
     private int horizontalScrollOffset;
+    //头部是否也要层叠，默认需要
+    private boolean topOverFlying;
     private viewEdgeListener mViewEdgeListener;
 
     public OverFlyingLayoutManager() {
@@ -35,10 +37,12 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     }
 
     public OverFlyingLayoutManager(int orientation) {
-        if (orientation != OrientationHelper.VERTICAL && orientation != OrientationHelper.HORIZONTAL) {
-            throw new RuntimeException("方向必须是VERTICAL或者HORIZONTAL");
-        }
+        this(orientation, true);
+    }
+
+    public OverFlyingLayoutManager(int orientation, boolean topOverFlying) {
         this.orientation = orientation;
+        this.topOverFlying = topOverFlying;
     }
 
     public void setViewEdgeListener(viewEdgeListener viewEdgeListener) {
@@ -142,34 +146,41 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     @Override
     public int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
         //列表向下滚动dy为正，列表向上滚动dy为负，这点与Android坐标系保持一致。
+        int tempDy = dy;
         if (verticalScrollOffset <= totalHeight - getVerticalSpace()) {
             verticalScrollOffset += dy;
             //将竖直方向的偏移量+travel
         }
         if (verticalScrollOffset > totalHeight - getVerticalSpace()) {
             verticalScrollOffset = totalHeight - getVerticalSpace();
+            tempDy = 0;
         } else if (verticalScrollOffset < 0) {
             verticalScrollOffset = 0;
+            tempDy = 0;
         }
         detachAndScrapAttachedViews(recycler);
         addAndLayoutViewVertical(recycler, state, verticalScrollOffset); //从新布局位置、显示View
-        return dy;
+        return tempDy;
     }
 
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
+
+        int tempDx = dx;
         if (horizontalScrollOffset <= totalWidth - getHorizontalSpace()) {
             horizontalScrollOffset += dx;
             //将竖直方向的偏移量+travel
         }
         if (horizontalScrollOffset > totalWidth - getHorizontalSpace()) {
             horizontalScrollOffset = totalWidth - getHorizontalSpace();
+            tempDx = 0;
         } else if (horizontalScrollOffset < 0) {
             horizontalScrollOffset = 0;
+            tempDx = 0;
         }
         detachAndScrapAttachedViews(recycler);
         addAndLayoutViewHorizontal(recycler, state, horizontalScrollOffset); //从新布局位置、显示View
-        return dx;
+        return tempDx;
 
     }
 
@@ -195,7 +206,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             if (bottomOffset > displayHeight) {//到底了
                 layoutDecoratedWithMargins(view, 0, displayHeight - height, width, displayHeight);
             } else {
-                if (topOffset <= 0) {//到顶了
+                if (topOffset <= 0 && topOverFlying) {//到顶了
                     layoutDecoratedWithMargins(view, 0, 0, width, height);
                 } else {
                     layoutDecoratedWithMargins(view, 0, topOffset, width, bottomOffset);
@@ -211,7 +222,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                     }
                 }
             }
-            if (i != 0) {//除第一个外的顶部黏性动画
+            if (i != 0 && topOverFlying) {//除第一个外的顶部黏性动画
                 if ((topOffset > 0 && height / 2 >= topOffset) || (topOffset <= 0 && height / 2 >= -topOffset)) {
                     int top = height / 2 - (height / 2 - topOffset) / 2;
                     layoutDecoratedWithMargins(view, 0, top, width, top + height);
@@ -247,15 +258,15 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             if (rightOffset > displayWidth) {//到右边
                 layoutDecoratedWithMargins(view, displayWidth - width, 0, displayWidth, height);
             } else {
-                if (leftOffset <= 0) {//到左边了
+                if (leftOffset <= 0 && topOverFlying) {//到左边了
                     layoutDecoratedWithMargins(view, 0, 0, width, height);
                 } else {
                     layoutDecoratedWithMargins(view, leftOffset, 0, rightOffset, height);
                 }
             }
-           /* if (i != getItemCount() - 1) {//除最后一个外的黏性慢速动画
+            if (i != getItemCount() - 1) {//除最后一个外的黏性慢速动画
                 if ((rightOffset <= displayWidth && displayWidth - rightOffset <= width / 2)
-                        || (rightOffset > displayWidth && displayWidth + height / 2 >= rightOffset)) {
+                        || (rightOffset > displayWidth && displayWidth + width / 2 >= rightOffset)) {
                     int right = (width / 2 - (displayWidth - rightOffset)) / 2 + displayWidth - width / 2;
                     layoutDecoratedWithMargins(view, right - width, 0, right, height);
                     if (mViewEdgeListener != null) {
@@ -263,15 +274,15 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                     }
                 }
             }
-            if (i != 0) {//除第一个外的顶部黏性动画
-                if ((leftOffset > 0 && height / 2 >= leftOffset) || (leftOffset <= 0 && width / 2 >= -leftOffset)) {
+            if (i != 0 && topOverFlying) {//除第一个外的顶部黏性动画
+                if ((leftOffset > 0 && width / 2 >= leftOffset) || (leftOffset <= 0 && width / 2 >= -leftOffset)) {
                     int left = width / 2 - (width / 2 - leftOffset) / 2;
                     layoutDecoratedWithMargins(view, left, 0, left + width, height);
                     if (mViewEdgeListener != null) {
                         mViewEdgeListener.onTop(view, left / (float) width);
                     }
                 }
-            }*/
+            }
         }
 
         Log.e(TAG, "itemCount = " + getChildCount());

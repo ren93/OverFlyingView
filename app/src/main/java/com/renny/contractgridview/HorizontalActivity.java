@@ -29,7 +29,7 @@ public class HorizontalActivity extends AppCompatActivity {
     private void initView() {
         mRecyclerView = findViewById(R.id.recyclerView);
         OverFlyingLayoutManager layoutManager = new OverFlyingLayoutManager(OrientationHelper.HORIZONTAL);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager( new OverFlyingLayoutManager(OrientationHelper.HORIZONTAL));
         layoutManager.setViewEdgeListener(new OverFlyingLayoutManager.viewEdgeListener() {
             @Override
             public void onTop(View view, float offsetPercent) {
