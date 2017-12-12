@@ -38,12 +38,17 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         super.onLayoutChildren(recycler, state);
         // 先把所有的View先从RecyclerView中detach掉，然后标记为"Scrap"状态，表示这些View处于可被重用状态(非显示中)。
         // 实际就是把View放到了Recycler中的一个集合中。
+        reset();
         detachAndScrapAttachedViews(recycler);
         calculateChildrenSite(recycler, state);
     }
 
-    private void calculateChildrenSite(RecyclerView.Recycler recycler, RecyclerView.State state) {
+    private void reset() {
         totalHeight = 0;
+        verticalScrollOffset = 0;
+    }
+
+    private void calculateChildrenSite(RecyclerView.Recycler recycler, RecyclerView.State state) {
 
         for (int i = 0; i < getItemCount(); i++) {
             View view = recycler.getViewForPosition(i);
@@ -104,6 +109,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         if (getItemCount() <= 0 || state.isPreLayout()) {
             return;
         }
+        int displayHeight = getVerticalSpace();
         for (int i = getItemCount() - 1; i >= 0; i--) {
             // 遍历Recycler中保存的View取出来
             View view = recycler.getViewForPosition(i);
@@ -116,8 +122,11 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             //调用这个方法能够调整ItemView的大小，以除去ItemDecorator。
             calculateItemDecorationsForChild(view, new Rect());
 
-            if (mTmpRect.bottom - offset > getVerticalSpace()) {
-                layoutDecorated(view, 0, getVerticalSpace() - height, width, getVerticalSpace());
+            int bottomOffset = mTmpRect.bottom - offset;
+            if (bottomOffset > displayHeight) {
+
+                    layoutDecorated(view, 0, displayHeight - height, width, displayHeight);
+
             } else {
                 if (mTmpRect.top - offset <= 0) {
                     layoutDecorated(view, 0, 0, width, height);
