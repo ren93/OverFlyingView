@@ -17,7 +17,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
 
     private static final String TAG = "aaaa";
 
-    int orientation = OrientationHelper.VERTICAL;
+    private int orientation = OrientationHelper.VERTICAL;
 
     // 用于保存item的位置信息
     private SparseArray<Rect> allItemRects = new SparseArray<>();
@@ -25,7 +25,9 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     private SparseBooleanArray itemStates = new SparseBooleanArray();
 
     private int totalHeight = 0;
+    private int totalWidth = 0;
     private int verticalScrollOffset;
+    private int horizontalScrollOffset;
     private viewEdgeListener mViewEdgeListener;
 
     public OverFlyingLayoutManager() {
@@ -62,10 +64,20 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     private void reset() {
         totalHeight = 0;
         verticalScrollOffset = 0;
+        totalWidth = 0;
+        horizontalScrollOffset = 0;
     }
 
     private void calculateChildrenSite(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        if (orientation == OrientationHelper.VERTICAL) {
+            calculateChildrenSiteVertical(recycler, state);
+        } else {
+            calculateChildrenSiteHorizontal(recycler, state);
+        }
 
+    }
+
+    private void calculateChildrenSiteVertical(RecyclerView.Recycler recycler, RecyclerView.State state) {
         for (int i = 0; i < getItemCount(); i++) {
             View view = recycler.getViewForPosition(i);
             addView(view);
@@ -80,15 +92,39 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                 mTmpRect = new Rect();
             }
             mTmpRect.set(0, totalHeight, width, totalHeight + height);
-            totalHeight = totalHeight + height;
+            totalHeight += height;
             // 保存ItemView的位置信息
             allItemRects.put(i, mTmpRect);
             // 由于之前调用过detachAndScrapAttachedViews(recycler)，所以此时item都是不可见的
             itemStates.put(i, false);
         }
         detachAndScrapAttachedViews(recycler);
-        addAndLayoutView(recycler, state, 0);
+        addAndLayoutViewVertical(recycler, state, 0);
+    }
 
+    private void calculateChildrenSiteHorizontal(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        for (int i = 0; i < getItemCount(); i++) {
+            View view = recycler.getViewForPosition(i);
+            addView(view);
+            // 我们自己指定ItemView的尺寸。
+            measureChildWithMargins(view, 0, 0);
+            calculateItemDecorationsForChild(view, new Rect());
+            int width = getDecoratedMeasuredWidth(view);
+            int height = getDecoratedMeasuredHeight(view);
+
+            Rect mTmpRect = allItemRects.get(i);
+            if (mTmpRect == null) {
+                mTmpRect = new Rect();
+            }
+            mTmpRect.set(totalWidth, 0, totalWidth + width, height);
+            totalWidth += width;
+            // 保存ItemView的位置信息
+            allItemRects.put(i, mTmpRect);
+            // 由于之前调用过detachAndScrapAttachedViews(recycler)，所以此时item都是不可见的
+            itemStates.put(i, false);
+        }
+        detachAndScrapAttachedViews(recycler);
+        addAndLayoutViewHorizontal(recycler, state, 0);
     }
 
     @Override
@@ -116,11 +152,28 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             verticalScrollOffset = 0;
         }
         detachAndScrapAttachedViews(recycler);
-        addAndLayoutView(recycler, state, verticalScrollOffset); //从新布局位置、显示View
+        addAndLayoutViewVertical(recycler, state, verticalScrollOffset); //从新布局位置、显示View
         return dy;
     }
 
-    private void addAndLayoutView(RecyclerView.Recycler recycler, RecyclerView.State state, int offset) {
+    @Override
+    public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        if (horizontalScrollOffset <= totalWidth - getHorizontalSpace()) {
+            horizontalScrollOffset += dx;
+            //将竖直方向的偏移量+travel
+        }
+        if (horizontalScrollOffset > totalWidth - getHorizontalSpace()) {
+            horizontalScrollOffset = totalWidth - getHorizontalSpace();
+        } else if (horizontalScrollOffset < 0) {
+            horizontalScrollOffset = 0;
+        }
+        detachAndScrapAttachedViews(recycler);
+        addAndLayoutViewHorizontal(recycler, state, horizontalScrollOffset); //从新布局位置、显示View
+        return dx;
+
+    }
+
+    private void addAndLayoutViewVertical(RecyclerView.Recycler recycler, RecyclerView.State state, int offset) {
         if (getItemCount() <= 0 || state.isPreLayout()) {
             return;
         }
@@ -172,6 +225,57 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         Log.e(TAG, "itemCount = " + getChildCount());
     }
 
+    private void addAndLayoutViewHorizontal(RecyclerView.Recycler recycler, RecyclerView.State state, int offset) {
+        if (getItemCount() <= 0 || state.isPreLayout()) {
+            return;
+        }
+        int displayWidth = getHorizontalSpace();
+        for (int i = getItemCount() - 1; i >= 0; i--) {
+            // 遍历Recycler中保存的View取出来
+            View view = recycler.getViewForPosition(i);
+            addView(view); // 因为刚刚进行了detach操作，所以现在可以重新添加
+            measureChildWithMargins(view, 0, 0); // 通知测量view的margin值
+            int width = getDecoratedMeasuredWidth(view); // 计算view实际大小，包括了ItemDecorator中设置的偏移量。
+            int height = getDecoratedMeasuredHeight(view);
+
+            Rect mTmpRect = allItemRects.get(i);
+            //调用这个方法能够调整ItemView的大小，以除去ItemDecorator。
+            calculateItemDecorationsForChild(view, new Rect());
+
+            int rightOffset = mTmpRect.right - offset;
+            int leftOffset = mTmpRect.left - offset;
+            if (rightOffset > displayWidth) {//到右边
+                layoutDecoratedWithMargins(view, displayWidth - width, 0, displayWidth, height);
+            } else {
+                if (leftOffset <= 0) {//到左边了
+                    layoutDecoratedWithMargins(view, 0, 0, width, height);
+                } else {
+                    layoutDecoratedWithMargins(view, leftOffset, 0, rightOffset, height);
+                }
+            }
+           /* if (i != getItemCount() - 1) {//除最后一个外的黏性慢速动画
+                if ((rightOffset <= displayWidth && displayWidth - rightOffset <= width / 2)
+                        || (rightOffset > displayWidth && displayWidth + height / 2 >= rightOffset)) {
+                    int right = (width / 2 - (displayWidth - rightOffset)) / 2 + displayWidth - width / 2;
+                    layoutDecoratedWithMargins(view, right - width, 0, right, height);
+                    if (mViewEdgeListener != null) {
+                        mViewEdgeListener.onBottom(view, (displayWidth - right) / (float) width);
+                    }
+                }
+            }
+            if (i != 0) {//除第一个外的顶部黏性动画
+                if ((leftOffset > 0 && height / 2 >= leftOffset) || (leftOffset <= 0 && width / 2 >= -leftOffset)) {
+                    int left = width / 2 - (width / 2 - leftOffset) / 2;
+                    layoutDecoratedWithMargins(view, left, 0, left + width, height);
+                    if (mViewEdgeListener != null) {
+                        mViewEdgeListener.onTop(view, left / (float) width);
+                    }
+                }
+            }*/
+        }
+
+        Log.e(TAG, "itemCount = " + getChildCount());
+    }
 
     private int getVerticalSpace() {
         // 计算RecyclerView的可用高度，除去上下Padding值

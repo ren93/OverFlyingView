@@ -8,10 +8,38 @@
     tools:context="com.renny.contractgridview.MainActivity">
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#666666"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/background"
+        android:gravity="center"
+        android:elevation="6dp"
+        android:onClick="showBottomDialog"
+        android:padding="12dp"
+        android:text="底部层叠弹框"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/background"
+        android:gravity="center"
+        android:elevation="6dp"
+        android:onClick="goVer"
+        android:padding="12dp"
+        android:text="竖向叠层RecyclerView"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/background"
+        android:gravity="center"
+        android:elevation="6dp"
+        android:onClick="goHor"
+        android:padding="12dp"
+        android:text="横向叠层RecyclerView"/>
 
 </LinearLayout>
