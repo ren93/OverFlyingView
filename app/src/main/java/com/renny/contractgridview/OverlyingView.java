@@ -15,7 +15,7 @@ import android.view.ViewGroup;
  * Created by Renny on 2017/12/7.
  */
 
-public class ContractGridView extends ViewGroup {
+public class OverlyingView extends ViewGroup {
 
     private ViewDragHelper mDragger;
     private View topView, bottomView;
@@ -24,15 +24,15 @@ public class ContractGridView extends ViewGroup {
     private int extendHeight = 30;//延伸高度
     private boolean isExpand = true;
 
-    public ContractGridView(@NonNull Context context) {
+    public OverlyingView(@NonNull Context context) {
         this(context, null);
     }
 
-    public ContractGridView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public OverlyingView(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ContractGridView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public OverlyingView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -90,14 +90,14 @@ public class ContractGridView extends ViewGroup {
         @Override
         public int clampViewPositionVertical(View child, int top, int dy) {
             final int topBound = getPaddingTop();
-            final int bottomBound = getHeight() - child.getHeight() - topBound - elevationHeight;
+            final int bottomBound = getHeight() - child.getHeight() - getPaddingBottom() - elevationHeight;
             return Math.min(Math.max(top, topBound), bottomBound);
         }
 
         @Override
         public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
             float percent = (float) top / (getHeight() - changedView.getHeight() - elevationHeight);
-            Log.d("xxxx", "percent" + percent);
+            Log.d("OverlyingView", "percent" + percent);
             if (mOpenChangeListener != null) {
                 mOpenChangeListener.onScrolling(percent);
             }
@@ -148,9 +148,7 @@ public class ContractGridView extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        /**
-         * 获得此ViewGroup上级容器为其推荐的宽和高，以及计算模式
-         */
+        // 获得此ViewGroup上级容器为其推荐的宽和高，以及计算模式
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int sizeWidth = MeasureSpec.getSize(widthMeasureSpec);
@@ -162,9 +160,9 @@ public class ContractGridView extends ViewGroup {
         int width = 0;
         int height = 0;
 
-        /**
-         * 根据childView计算的出的宽和高，以及设置的margin计算容器的宽和高，主要用于容器是warp_content时
-         */
+
+        //  根据childView计算的出的宽和高，以及设置的margin计算容器的宽和高，主要用于容器是warp_content时
+
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
             MarginLayoutParams cParams = (MarginLayoutParams) childView.getLayoutParams();
@@ -174,10 +172,8 @@ public class ContractGridView extends ViewGroup {
             height = height + cHeightWithMargin;
             width = cWidthWithMargin > width ? cWidthWithMargin : width;
         }
-        /**
-         * 如果是wrap_content设置为我们计算的值
-         * 否则：直接设置为父容器计算的值
-         */
+
+        // 如果是wrap_content设置为我们计算的值,否则：直接设置为父容器计算的值
         setMeasuredDimension((widthMode == MeasureSpec.EXACTLY) ? sizeWidth
                 : width, (heightMode == MeasureSpec.EXACTLY) ? sizeHeight
                 : height);

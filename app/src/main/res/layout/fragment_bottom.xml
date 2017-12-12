@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.renny.contractgridview.ContractGridView
+    <com.renny.contractgridview.OverlyingView
+        android:id="@+id/view_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp">
@@ -110,5 +111,5 @@
                 android:scaleType="center"
                 android:src="@drawable/bg_ie"/>
         </LinearLayout>
-    </com.renny.contractgridview.ContractGridView>
+    </com.renny.contractgridview.OverlyingView>
 </FrameLayout>
