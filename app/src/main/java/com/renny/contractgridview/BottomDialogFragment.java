@@ -38,7 +38,6 @@ public class BottomDialogFragment extends DialogFragment implements View.OnClick
         view.findViewById(R.id.ie1).setOnClickListener(this);
         view.findViewById(R.id.ie2).setOnClickListener(this);
         view.findViewById(R.id.ie3).setOnClickListener(this);
-
     }
 
     public void onStart() {
