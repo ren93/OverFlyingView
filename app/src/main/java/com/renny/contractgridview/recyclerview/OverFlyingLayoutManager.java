@@ -133,14 +133,19 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                     layoutDecorated(view, 0, topOffset, width, bottomOffset);
                 }
             }
-            if (i != getItemCount() - 1) {//除最后一个外的底部慢速动画
-                if ((bottomOffset <= displayHeight && displayHeight - bottomOffset <= height) ||
-                        (bottomOffset > displayHeight && displayHeight + height >= bottomOffset)) {
+            if (i != getItemCount() - 1) {//除最后一个外的黏性慢速动画
+                if ((bottomOffset <= displayHeight && displayHeight - bottomOffset <= height)
+                        || (bottomOffset > displayHeight && displayHeight + height >= bottomOffset)) {
                     int bottom = (height - (displayHeight - bottomOffset)) / 2 + displayHeight - height;
                     layoutDecorated(view, 0, bottom - height, width, bottom);
                 }
             }
-
+            if (i != 0) {//除第一个外的顶部黏性动画
+                if ((topOffset > 0 && height >= topOffset) || (topOffset <= 0 && height >= -topOffset)) {
+                    int top = height - (height - topOffset) / 2;
+                    layoutDecorated(view, 0, top, width, top + height);
+                }
+            }
         }
 
         Log.e(TAG, "itemCount = " + getChildCount());
