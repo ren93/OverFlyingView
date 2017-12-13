@@ -26,11 +26,11 @@ public class VertialActivity extends AppCompatActivity {
 
     private void initView() {
         mRecyclerView = findViewById(R.id.recyclerView);
-        OverFlyingLayoutManager layoutManager = new OverFlyingLayoutManager(OrientationHelper.VERTICAL,false);
+        OverFlyingLayoutManager layoutManager = new OverFlyingLayoutManager(OrientationHelper.VERTICAL,true);
         mRecyclerView.setLayoutManager(layoutManager);
 
         //构建一个临时数据源
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 26; i++) {
             items.add("Item:第" + i + "项");
         }
         mAdapter = new ItemAdapter(items);
