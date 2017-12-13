@@ -36,4 +36,8 @@ public class MainActivity extends AppCompatActivity {
     public void goHor(View view) {
         startActivity(new Intent(MainActivity.this,HorizontalActivity.class));
     }
+
+    public void goVerSingle(View view) {
+        startActivity(new Intent(MainActivity.this,Vertial2Activity.class));
+    }
 }

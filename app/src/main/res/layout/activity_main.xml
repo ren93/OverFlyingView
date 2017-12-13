@@ -29,7 +29,16 @@
         android:onClick="goVer"
         android:padding="12dp"
         android:text="竖向叠层RecyclerView"/>
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/background"
+        android:gravity="center"
+        android:elevation="6dp"
+        android:onClick="goVerSingle"
+        android:padding="12dp"
+        android:text="竖向叠层RecyclerView（单边）"/>
 
     <TextView
         android:layout_width="match_parent"

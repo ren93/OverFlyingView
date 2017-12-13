@@ -12,13 +12,14 @@ import com.renny.contractgridview.recyclerview.OverFlyingLayoutManager;
 
 import java.util.ArrayList;
 
-public class VertialActivity extends AppCompatActivity {
+public class Vertial2Activity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private ItemAdapter mAdapter;
     private ArrayList<String> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vertial);
         initView();
@@ -26,11 +27,11 @@ public class VertialActivity extends AppCompatActivity {
 
     private void initView() {
         mRecyclerView = findViewById(R.id.recyclerView);
-        OverFlyingLayoutManager layoutManager = new OverFlyingLayoutManager(OrientationHelper.VERTICAL,true);
+        OverFlyingLayoutManager layoutManager = new OverFlyingLayoutManager(OrientationHelper.VERTICAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
 
         //构建一个临时数据源
-        for (int i = 0; i < 1126; i++) {
+        for (int i = 0; i < 126; i++) {
             items.add("Item:第" + i + "项");
         }
         mAdapter = new ItemAdapter(items);
@@ -38,10 +39,8 @@ public class VertialActivity extends AppCompatActivity {
         mAdapter.setOnItemClickListerer(new ItemAdapter.onItemClickListener() {
             @Override
             public void onItemClick(View view) {
-                Toast.makeText(VertialActivity.this, "", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Vertial2Activity.this, "", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
-
 }

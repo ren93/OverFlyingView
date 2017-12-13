@@ -20,6 +20,8 @@
         </activity>
         <activity android:name=".HorizontalActivity">
         </activity>
+        <activity android:name=".Vertial2Activity">
+        </activity>
     </application>
 
 </manifest>
