@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 /**
  * Created by LuckyCrystal on 2017/6/6.
- *
  */
 
 public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
@@ -65,6 +64,13 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         super.onLayoutChildren(recycler, state);
         // 先把所有的View先从RecyclerView中detach掉，然后标记为"Scrap"状态，表示这些View处于可被重用状态(非显示中)。
         // 实际就是把View放到了Recycler中的一个集合中。
+        if (getItemCount() == 0) {//没有Item
+            detachAndScrapAttachedViews(recycler);
+            return;
+        }
+        if (getChildCount() == 0 && state.isPreLayout()) {
+            return;
+        }
         reset();
         detachAndScrapAttachedViews(recycler);
         calculateChildrenSite(recycler, state);
@@ -90,9 +96,8 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void calculateChildrenSiteVertical(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        View view = recycler.getViewForPosition(0);//暂时这么解决，不能layout出所有的子View
         for (int i = 0; i < getItemCount(); i++) {
-            View view = recycler.getViewForPosition(i);
-
             measureChildWithMargins(view, 0, 0);
             calculateItemDecorationsForChild(view, new Rect());
             int width = getDecoratedMeasuredWidth(view);
@@ -109,13 +114,13 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             // 由于之前调用过detachAndScrapAttachedViews(recycler)，所以此时item都是不可见的
             itemStates.put(i, false);
         }
-        Log.d(TAG, "childCountI = " + getChildCount() + "  itemCount= " +  getItemCount());
+        Log.d(TAG, "childCountI = " + getChildCount() + "  itemCount= " + recycler.getScrapList().size());
         addAndLayoutViewVertical(recycler, state, verticalScrollOffset);
     }
 
     private void calculateChildrenSiteHorizontal(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        View view = recycler.getViewForPosition(0);
         for (int i = 0; i < getItemCount(); i++) {
-            View view = recycler.getViewForPosition(i);
             addView(view);
             // 我们自己指定ItemView的尺寸。
             measureChildWithMargins(view, 0, 0);
