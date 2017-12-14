@@ -13,16 +13,18 @@ import android.view.ViewGroup;
 
 /**
  * Created by LuckyCrystal on 2017/6/6.
+ *
  */
 
 public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
 
-    private static final String TAG = "aaaa";
-    private @FloatRange(from = 0.01, to = 1.0)
-    float edgePercent = 0.5f;//触发边缘动画距离百分比
+    private static final String TAG = "OverFlying";
 
-    private @IntRange(from = 1)
-    int slowTimes = 5;//到达此距离后放慢倍数
+    private @FloatRange(from = 0.01, to = 1.0)
+    float edgePercent = 0.8f;//触发边缘动画距离百分比
+
+    private @FloatRange(from = 1)
+    float slowTimes = 3;//到达此距离后放慢倍数
 
     private int orientation = OrientationHelper.VERTICAL;
     private boolean offsetUseful = false;
@@ -37,7 +39,6 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     private int horizontalScrollOffset;
     //头部是否也要层叠，默认需要
     private boolean topOverFlying;
-    private viewEdgeListener mViewEdgeListener;
 
     public OverFlyingLayoutManager() {
         this(OrientationHelper.VERTICAL);
@@ -52,9 +53,6 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         this.topOverFlying = topOverFlying;
     }
 
-    public void setViewEdgeListener(viewEdgeListener viewEdgeListener) {
-        mViewEdgeListener = viewEdgeListener;
-    }
 
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
@@ -94,13 +92,12 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     private void calculateChildrenSiteVertical(RecyclerView.Recycler recycler, RecyclerView.State state) {
         for (int i = 0; i < getItemCount(); i++) {
             View view = recycler.getViewForPosition(i);
-            addView(view);
-            // 我们自己指定ItemView的尺寸。
+
             measureChildWithMargins(view, 0, 0);
             calculateItemDecorationsForChild(view, new Rect());
             int width = getDecoratedMeasuredWidth(view);
             int height = getDecoratedMeasuredHeight(view);
-            overFlyingDist = slowTimes * height;
+            overFlyingDist = (int) (slowTimes * height);
             Rect mTmpRect = allItemRects.get(i);
             if (mTmpRect == null) {
                 mTmpRect = new Rect();
@@ -112,7 +109,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             // 由于之前调用过detachAndScrapAttachedViews(recycler)，所以此时item都是不可见的
             itemStates.put(i, false);
         }
-        detachAndScrapAttachedViews(recycler);
+        Log.d(TAG, "childCountI = " + getChildCount() + "  itemCount= " +  getItemCount());
         addAndLayoutViewVertical(recycler, state, verticalScrollOffset);
     }
 
@@ -125,7 +122,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             calculateItemDecorationsForChild(view, new Rect());
             int width = getDecoratedMeasuredWidth(view);
             int height = getDecoratedMeasuredHeight(view);
-            overFlyingDist = slowTimes * width;
+            overFlyingDist = (int) (slowTimes * width);
 
             Rect mTmpRect = allItemRects.get(i);
             if (mTmpRect == null) {
@@ -227,7 +224,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                     if (i != 0) {//除第一个外的顶部黏性动画
                         if (topOffset <= height * edgePercent) {//到达顶部边界了
                             int edgeDist = (int) (height * edgePercent);//边界触发距离
-                            int top = edgeDist - (edgeDist - topOffset) / slowTimes;//到达边界后速度放慢到原来5分之一
+                            int top = (int) (edgeDist - (edgeDist - topOffset) / slowTimes);//到达边界后速度放慢到原来5分之一
 
                             top = Math.max(top, 0);
                             realBottomOffset = top + height;
@@ -239,7 +236,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                 if (i != itemCount - 1) {//除最后一个外的底部慢速动画
                     if (displayHeight - bottomOffset <= height * edgePercent) {
                         int edgeDist = (int) (displayHeight - height * edgePercent);
-                        int bottom = edgeDist + (bottomOffset - edgeDist) / slowTimes;
+                        int bottom = (int) (edgeDist + (bottomOffset - edgeDist) / slowTimes);
                         bottom = Math.min(bottom, displayHeight);
                         realBottomOffset = bottom;
 
@@ -291,7 +288,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                     if (i != 0) {
                         if (leftOffset <= width * edgePercent) {//到达边界了
                             int edgeDist = (int) (width * edgePercent);//边界触发距离
-                            int left = edgeDist - (edgeDist - leftOffset) / slowTimes;///到达边界后速度放慢到原来5分之一
+                            int left = (int) (edgeDist - (edgeDist - leftOffset) / slowTimes);///到达边界后速度放慢到原来5分之一
                             left = Math.max(0, left);
                             if (left < 0) {
                                 left = 0;
@@ -305,7 +302,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                 if (i != itemCount - 1) {//除最后一个外的右边缘慢速动画
                     if (displayWidth - rightOffset <= width * edgePercent) {
                         int edgeDist = (int) (displayWidth - width * edgePercent);
-                        int right = edgeDist + (rightOffset - edgeDist) / slowTimes;
+                        int right = (int) (edgeDist + (rightOffset - edgeDist) / slowTimes);
                         if (right >= displayWidth) {
                             right = displayWidth;
                         }
@@ -371,16 +368,10 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         requestLayout();
     }
 
-
     public void setSlowTimes(@IntRange(from = 1) int slowTimes) {
         this.slowTimes = slowTimes;
     }
 
-    public interface viewEdgeListener {
-        void onTop(View view, float offsetPercent);
 
-        void onBottom(View view, float offsetPercent);
-
-    }
 }
 
