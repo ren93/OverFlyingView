@@ -25,7 +25,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     int slowTimes = 5;//到达此距离后放慢倍数
 
     private int orientation = OrientationHelper.VERTICAL;
-
+    private boolean offsetUseful = false;
     // 用于保存item的位置信息
     private SparseArray<Rect> allItemRects = new SparseArray<>();
     // 用于保存item是否处于可见状态的信息
@@ -74,9 +74,12 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
 
     private void reset() {
         totalHeight = 0;
-        verticalScrollOffset = 0;
         totalWidth = 0;
-        horizontalScrollOffset = 0;
+        if (!offsetUseful) {
+            verticalScrollOffset = 0;
+            horizontalScrollOffset = 0;
+        }
+        offsetUseful = false;
     }
 
     private void calculateChildrenSite(RecyclerView.Recycler recycler, RecyclerView.State state) {
@@ -110,7 +113,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             itemStates.put(i, false);
         }
         detachAndScrapAttachedViews(recycler);
-        addAndLayoutViewVertical(recycler, state, 0);
+        addAndLayoutViewVertical(recycler, state, verticalScrollOffset);
     }
 
     private void calculateChildrenSiteHorizontal(RecyclerView.Recycler recycler, RecyclerView.State state) {
@@ -136,7 +139,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
             itemStates.put(i, false);
         }
         detachAndScrapAttachedViews(recycler);
-        addAndLayoutViewHorizontal(recycler, state, 0);
+        addAndLayoutViewHorizontal(recycler, state, horizontalScrollOffset);
     }
 
     @Override
@@ -358,6 +361,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     public void scrollToPosition(int position) {
         Rect mTmpRect = allItemRects.get(position);
         if (mTmpRect != null) {
+            offsetUseful = true;
             if (orientation == OrientationHelper.VERTICAL) {
                 verticalScrollOffset = mTmpRect.top;
             } else {

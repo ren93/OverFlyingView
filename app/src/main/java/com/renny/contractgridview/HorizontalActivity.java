@@ -58,5 +58,4 @@ public class HorizontalActivity extends AppCompatActivity {
         });
     }
 
-
 }
