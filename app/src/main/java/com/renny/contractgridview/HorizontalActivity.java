@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Toast;
 
 import com.renny.contractgridview.recyclerview.ItemAdapterHor;
 import com.renny.contractgridview.recyclerview.OverFlyingLayoutManager;
@@ -44,7 +43,7 @@ public class HorizontalActivity extends AppCompatActivity {
         adapter.setOnItemClickListerer(new ItemAdapterHor.onItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(HorizontalActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(HorizontalActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -53,7 +52,7 @@ public class HorizontalActivity extends AppCompatActivity {
         adapter2.setOnItemClickListerer(new ItemAdapterHor.onItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(HorizontalActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(HorizontalActivity.this, "position:" + position, Toast.LENGTH_SHORT).show();
             }
         });
     }

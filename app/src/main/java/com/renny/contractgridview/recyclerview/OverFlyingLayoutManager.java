@@ -6,8 +6,6 @@ import android.support.annotation.IntRange;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseArray;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,10 +25,6 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
 
     private int orientation = OrientationHelper.VERTICAL;
     private boolean offsetUseful = false;
-    // 用于保存item的位置信息
-    private SparseArray<Rect> allItemRects = new SparseArray<>();
-    // 用于保存item是否处于可见状态的信息
-    private SparseBooleanArray itemStates = new SparseBooleanArray();
     private int overFlyingDist;
     private int totalHeight = 0;
     private int totalWidth = 0;
@@ -38,6 +32,7 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     private int horizontalScrollOffset;
     //头部是否也要层叠，默认需要
     private boolean topOverFlying;
+    private int viewWidth, viewHeight;
 
     public OverFlyingLayoutManager() {
         this(OrientationHelper.VERTICAL);
@@ -89,59 +84,35 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
     private void calculateChildrenSite(RecyclerView.Recycler recycler, RecyclerView.State state) {
         if (orientation == OrientationHelper.VERTICAL) {
             calculateChildrenSiteVertical(recycler, state);
+            addAndLayoutViewVertical(recycler, state, verticalScrollOffset);
         } else {
             calculateChildrenSiteHorizontal(recycler, state);
+            addAndLayoutViewHorizontal(recycler, state, horizontalScrollOffset);
         }
 
     }
 
     private void calculateChildrenSiteVertical(RecyclerView.Recycler recycler, RecyclerView.State state) {
         View view = recycler.getViewForPosition(0);//暂时这么解决，不能layout出所有的子View
-        for (int i = 0; i < getItemCount(); i++) {
-            measureChildWithMargins(view, 0, 0);
-            calculateItemDecorationsForChild(view, new Rect());
-            int width = getDecoratedMeasuredWidth(view);
-            int height = getDecoratedMeasuredHeight(view);
-            overFlyingDist = (int) (slowTimes * height);
-            Rect mTmpRect = allItemRects.get(i);
-            if (mTmpRect == null) {
-                mTmpRect = new Rect();
-            }
-            mTmpRect.set(0, totalHeight, width, totalHeight + height);
-            totalHeight += height;
-            // 保存ItemView的位置信息
-            allItemRects.put(i, mTmpRect);
-            // 由于之前调用过detachAndScrapAttachedViews(recycler)，所以此时item都是不可见的
-            itemStates.put(i, false);
-        }
+        measureChildWithMargins(view, 0, 0);
+        calculateItemDecorationsForChild(view, new Rect());
+
+        viewHeight = getDecoratedMeasuredHeight(view);
+        overFlyingDist = (int) (slowTimes * viewHeight);
+        totalHeight = getItemCount() * viewHeight;
         Log.d(TAG, "childCountI = " + getChildCount() + "  itemCount= " + recycler.getScrapList().size());
-        addAndLayoutViewVertical(recycler, state, verticalScrollOffset);
+
     }
 
-    private void calculateChildrenSiteHorizontal(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        View view = recycler.getViewForPosition(0);
-        for (int i = 0; i < getItemCount(); i++) {
-            addView(view);
-            // 我们自己指定ItemView的尺寸。
-            measureChildWithMargins(view, 0, 0);
-            calculateItemDecorationsForChild(view, new Rect());
-            int width = getDecoratedMeasuredWidth(view);
-            int height = getDecoratedMeasuredHeight(view);
-            overFlyingDist = (int) (slowTimes * width);
 
-            Rect mTmpRect = allItemRects.get(i);
-            if (mTmpRect == null) {
-                mTmpRect = new Rect();
-            }
-            mTmpRect.set(totalWidth, 0, totalWidth + width, height);
-            totalWidth += width;
-            // 保存ItemView的位置信息
-            allItemRects.put(i, mTmpRect);
-            // 由于之前调用过detachAndScrapAttachedViews(recycler)，所以此时item都是不可见的
-            itemStates.put(i, false);
-        }
-        detachAndScrapAttachedViews(recycler);
-        addAndLayoutViewHorizontal(recycler, state, horizontalScrollOffset);
+    private void calculateChildrenSiteHorizontal(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        View view = recycler.getViewForPosition(0);//暂时这么解决，不能layout出所有的子View
+        measureChildWithMargins(view, 0, 0);
+        calculateItemDecorationsForChild(view, new Rect());
+        viewWidth = getDecoratedMeasuredWidth(view);
+        overFlyingDist = (int) (slowTimes * viewWidth);
+        totalWidth = getItemCount() * viewWidth;
+        Log.d(TAG, "childCountI = " + getChildCount() + "  itemCount= " + recycler.getScrapList().size());
     }
 
     @Override
@@ -204,10 +175,10 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         }
         int displayHeight = getVerticalSpace();
         for (int i = itemCount - 1; i >= 0; i--) {
-            Rect mTmpRect = allItemRects.get(i);
+
             // 遍历Recycler中保存的View取出来
-            int bottomOffset = mTmpRect.bottom - offset;
-            int topOffset = mTmpRect.top - offset;
+            int bottomOffset = (i + 1) * viewHeight - offset;
+            int topOffset = i * viewHeight - offset;
             boolean needAdd = true;
             if (bottomOffset - displayHeight >= overFlyingDist) {
                 needAdd = false;
@@ -263,11 +234,9 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
         }
         int displayWidth = getHorizontalSpace();
 
-
         for (int i = itemCount - 1; i >= 0; i--) {
-            Rect mTmpRect = allItemRects.get(i);
-            int rightOffset = mTmpRect.right - offset;
-            int leftOffset = mTmpRect.left - offset;
+            int rightOffset = (i + 1) * viewWidth - offset;
+            int leftOffset = i * viewWidth - offset;
             boolean needAdd = true;
             if (rightOffset - displayWidth >= overFlyingDist) {
                 needAdd = false;
@@ -316,12 +285,11 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
                 } else {
                     realRightOffset = totalWidth > displayWidth ? displayWidth : totalWidth;
                 }
-
                 layoutDecoratedWithMargins(view, realRightOffset - width, 0, realRightOffset, height);
             }
         }
 
-        Log.d(TAG, "childCount = " + getChildCount() + "  itemCount= " + itemCount);
+        Log.d(TAG, "childCount = " + getChildCount() + "  itemCount= " +itemCount);
     }
 
     private int getVerticalSpace() {
@@ -361,14 +329,12 @@ public class OverFlyingLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public void scrollToPosition(int position) {
-        Rect mTmpRect = allItemRects.get(position);
-        if (mTmpRect != null) {
-            offsetUseful = true;
-            if (orientation == OrientationHelper.VERTICAL) {
-                verticalScrollOffset = mTmpRect.top;
-            } else {
-                horizontalScrollOffset = mTmpRect.left;
-            }
+
+        offsetUseful = true;
+        if (orientation == OrientationHelper.VERTICAL && viewHeight != 0) {
+            verticalScrollOffset = position * viewHeight;
+        } else if (orientation == OrientationHelper.HORIZONTAL && viewWidth != 0) {
+            horizontalScrollOffset = position * viewWidth;
         }
         requestLayout();
     }

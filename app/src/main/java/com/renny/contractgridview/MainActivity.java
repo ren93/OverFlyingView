@@ -18,10 +18,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     /**
      * 显示底部Dialog
-
      */
     public void showBottomDialog(View view) {
         FragmentManager fm = getSupportFragmentManager();
@@ -30,14 +28,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goVer(View view) {
-        startActivity(new Intent(MainActivity.this,VertialActivity.class));
+        startActivity(new Intent(MainActivity.this, VertialActivity.class));
     }
 
     public void goHor(View view) {
-        startActivity(new Intent(MainActivity.this,HorizontalActivity.class));
+        startActivity(new Intent(MainActivity.this, HorizontalActivity.class));
     }
 
     public void goVerSingle(View view) {
-        startActivity(new Intent(MainActivity.this,Vertial2Activity.class));
+        startActivity(new Intent(MainActivity.this, Vertial2Activity.class));
     }
 }
